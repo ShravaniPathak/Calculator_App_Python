@@ -2,11 +2,12 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
+import math
 
 class Calculator_App(App):
     def build(self):
         #Assign nums and operators
-        self.operators=["+","-","/","x"]
+        self.operators=["+","-","/","x","!", "%", "√"]
         self.nums=["0","1","2","3","4","5","6","7","8","9"]
         #Assign variables
         self.current_operater=None
@@ -29,10 +30,10 @@ class Calculator_App(App):
         #Build the box layout consisting of the buttons
         arr = [
             ["7", "8", "9", "/"],
-            ["4", "5", "6", "*"],
+            ["4", "5", "6", "x"],
             ["1", "2", "3", "-"],
             [".", "0", "C", "+"],
-            ["Backspace"]
+            ["<-", "!", "%", "√"]
         ]
         for row in arr:
             val_layout = BoxLayout()
@@ -68,24 +69,42 @@ class Calculator_App(App):
         #Check if the command is "Clear"
         if button_text=="C":
             self.enter_numbers.text=""
-        elif button_text=="Backspace":
+        #Check if the command is "Backspace"
+        elif button_text=="<-":
             self.enter_numbers.text=val[:-1]
         else:
+            #Check if two operators are entered consecutively
             if val and (self.current_button and self.current_operater in self.operators):
                 return
-            elif val=="" and button_text in self.operators:
+            #Check if an operators is the first digit
+            elif val=="" and button_text in self.operators and button_text!="√":
                 return
             else:
+                #Adjust the value at text input accordingly
                 new_text=val+button_text
                 self.enter_numbers.text=new_text
+        #Update variable values
         self.current_button=button_text
         self.current_operater=self.current_button in self.operators
     def equals_button_clicked(self, instance):
+        #Assign text input value to a variable
         val=self.enter_numbers.text
         if val:
+            #Check if the operation is !
+            button_factorial=self.enter_numbers.text[-1]
+            #Check if the operation is √
+            button_root=self.enter_numbers.text[0]
+            if button_factorial=="!":
+                #Factorial operation
+                temp=self.enter_numbers.text[:-1]
+                val=str(math.factorial(int(temp)))
+            elif button_root=="√":
+                #√ operation
+                temp=self.enter_numbers.text[1:]
+                val=str(math.sqrt(int(temp)))
+            #Using eval function to calculate
             equals_text=str(eval(val))
             self.enter_numbers.text=equals_text
-
 
 if __name__=='__main__':
     app=Calculator_App()
